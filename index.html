@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="it" data-app="CSVXpressSmart" data-ver="2.0.0">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>CSVXpressSmart 2026</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#1565c0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+  <link rel="apple-touch-icon" href="icon/icon-192.png"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="header-inner">
+    <div class="logo-wrap">
+      <img src="icon/icon-192.png" alt="Logo" class="logo" onerror="this.style.display='none'"/>
+      <div>
+        <h1>CSVXpressSmart <span class="badge">2026</span></h1>
+        <p class="tagline">Preventivi · Ordini · Disponibilità</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" id="btnTheme" title="Tema scuro/chiaro" aria-label="Cambia tema">🌙</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ===== TABS ===== -->
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="listino" role="tab" aria-selected="true">📋 Listino</button>
+    <button class="tab" data-tab="disponibilita" role="tab" aria-selected="false">📦 Disponibilità</button>
+    <button class="tab" data-tab="preventivo" role="tab" aria-selected="false">🧾 Preventivo</button>
+  </nav>
+
+  <!-- ==================== TAB: LISTINO ==================== -->
+  <section id="tab-listino" class="tab-panel active" aria-labelledby="tab-listino-btn">
+
+    <div class="card">
+      <h2>📋 Listino Prezzi (CSV)</h2>
+      <p class="muted">Carica il file CSV con Codice, Descrizione, PrezzoLordo, CostoTrasporto, CostoInstallazione</p>
+
+      <div class="upload-row">
+        <label class="upload-btn" for="csvFileInput">
+          <span>📂 Seleziona CSV</span>
+          <input type="file" id="csvFileInput" accept=".csv" style="display:none"/>
+        </label>
+        <span id="csvFileName" class="file-name muted">Nessun file selezionato</span>
+      </div>
+
+      <div class="memory-bar">
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleRememberCSV" checked/>
+          <span>Ricorda listino (non dover ricaricare ogni volta)</span>
+        </label>
+        <div class="btn-row">
+          <button class="btn-sm" id="btnLoadSavedCSV">⬆️ Carica salvato</button>
+          <button class="btn-sm btn-danger" id="btnClearSavedCSV">🗑️ Cancella</button>
+        </div>
+        <p id="savedCsvInfo" class="muted small">Nessun listino salvato.</p>
+      </div>
+
+      <div id="listinoStats" class="stats-bar" style="display:none">
+        <span id="statArticoli">0 articoli</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== TAB: DISPONIBILITÀ ==================== -->
+  <section id="tab-disponibilita" class="tab-panel" aria-labelledby="tab-disponibilita-btn">
+
+    <div class="card">
+      <h2>📦 Situazione Settimanale (Excel/CSV)</h2>
+      <p class="muted">Carica il file XLSX o CSV della situazione settimanale (Codice, Descrizione, Disponibilità, Arrivi, Note)</p>
+
+      <div class="upload-row">
+        <label class="upload-btn" for="xlsxFileInput">
+          <span>📂 Seleziona XLSX / CSV</span>
+          <input type="file" id="xlsxFileInput" accept=".xlsx,.xls,.csv" style="display:none"/>
+        </label>
+        <span id="xlsxFileName" class="file-name muted">Nessun file selezionato</span>
+      </div>
+
+      <div class="memory-bar">
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleRememberXLSX" checked/>
+          <span>Ricorda situazione settimanale</span>
+        </label>
+        <div class="btn-row">
+          <button class="btn-sm" id="btnLoadSavedXLSX">⬆️ Carica salvata</button>
+          <button class="btn-sm btn-danger" id="btnClearSavedXLSX">🗑️ Cancella</button>
+        </div>
+        <p id="savedXlsxInfo" class="muted small">Nessuna situazione salvata.</p>
+      </div>
+
+      <p id="xlsxError" class="error" style="display:none">❌ Errore nel caricamento del file.</p>
+    </div>
+
+    <!-- Filtri disponibilità -->
+    <div class="card" id="dispFilters" style="display:none">
+      <div class="filter-row">
+        <input type="text" id="searchDisp" placeholder="🔍 Cerca codice o descrizione…" class="search-input"/>
+        <select id="filterDisp" class="select-sm">
+          <option value="all">Tutti</option>
+          <option value="available">✅ Disponibili</option>
+          <option value="zero">⚠️ Esauriti</option>
+          <option value="arriving">🚚 In arrivo</option>
+          <option value="noted">📝 Con note</option>
+        </select>
+        <button class="btn-sm" id="btnExportDisp">📥 Esporta CSV</button>
+      </div>
+      <p class="muted small" id="dispCount"></p>
+    </div>
+
+    <!-- Tabella disponibilità -->
+    <div class="card table-card" id="dispTableWrap" style="display:none">
+      <div class="table-scroll">
+        <table id="dispTable">
+          <thead>
+            <tr>
+              <th>Codice</th>
+              <th>Descrizione</th>
+              <th class="num">Disp.</th>
+              <th class="num">Sett.15</th>
+              <th class="num">Sett.18</th>
+              <th class="num">Maggio</th>
+              <th class="num">Giugno</th>
+              <th>Note</th>
+              <th>Prenotazioni</th>
+              <th>Info</th>
+            </tr>
+          </thead>
+          <tbody id="dispBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== TAB: PREVENTIVO ==================== -->
+  <section id="tab-preventivo" class="tab-panel" aria-labelledby="tab-preventivo-btn">
+
+    <!-- Selezione articolo -->
+    <div class="card">
+      <h2>🔍 Seleziona Articolo</h2>
+      <div class="search-add-row">
+        <input type="text" id="searchListino" placeholder="Cerca codice o descrizione…" class="search-input"/>
+        <select id="listinoSelect"></select>
+        <button class="btn-primary" id="btnAddFromListino">➕ Aggiungi</button>
+      </div>
+      <p class="muted small" id="dispHint"></p>
+
+      <!-- Aggiunta manuale -->
+      <details class="manual-add">
+        <summary>✏️ Aggiungi manualmente</summary>
+        <div class="manual-form">
+          <input type="text" id="manCodice" placeholder="Codice"/>
+          <input type="text" id="manDescrizione" placeholder="Descrizione"/>
+          <input type="text" id="manPrezzo" placeholder="Prezzo lordo €" inputmode="decimal"/>
+          <input type="text" id="manTrasporto" placeholder="Trasporto €" inputmode="decimal"/>
+          <input type="text" id="manInstallazione" placeholder="Installazione €" inputmode="decimal"/>
+          <button class="btn-sm" id="btnAddManual">➕ Aggiungi manuale</button>
+        </div>
+      </details>
+    </div>
+
+    <!-- Opzioni Smart -->
+    <div class="card smart-card">
+      <h3>⚙️ Opzioni Preventivo</h3>
+      <div class="options-grid">
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleSmartMode"/>
+          <span>Modalità Cliente (nasconde margini)</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleShowVAT"/>
+          <span>Mostra IVA</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleHideVenduto" checked/>
+          <span>Ometti "Venduto €"</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleHideDiff" checked/>
+          <span>Ometti "Diff. sconto"</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleHideDiscounts" checked/>
+          <span>Ometti Sc.1/Sc.2 nel report</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleShowClientDiscount"/>
+          <span>Modalità Sconto Cliente</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="toggleAutoCosti" checked/>
+          <span>Popola Trasporto/Installazione automaticamente</span>
+        </label>
+      </div>
+      <div class="vat-row">
+        <label for="vatRate">IVA %</label>
+        <input type="text" id="vatRate" value="22" inputmode="decimal" class="vat-input"/>
+      </div>
+      <div class="eq-discount">
+        Sconto equivalente cliente: <strong id="smartEquivalentDiscount">—</strong>
+      </div>
+    </div>
+
+    <!-- Totali -->
+    <div class="card totali-card" id="totaliCard" style="display:none">
+      <div id="totaleGenerale"></div>
+    </div>
+
+    <!-- Tabella articoli -->
+    <div class="card table-card">
+      <div class="table-scroll">
+        <table id="articoli-table">
+          <thead>
+            <tr>
+              <th data-col="codice">Codice</th>
+              <th data-col="descrizione">Descrizione</th>
+              <th data-col="dispBadge" title="Disponibilità attuale (da sit. settimanale)">Disp.</th>
+              <th data-col="prezzoLordo">P.Lordo</th>
+              <th data-col="sconto1">Sc.1%</th>
+              <th data-col="sconto2">Sc.2%</th>
+              <th data-col="scontoCliente">Sc.Cli%</th>
+              <th data-col="margine">Marg.%</th>
+              <th data-col="totaleNetto">Netto/cad</th>
+              <th data-col="trasporto">Trasp.</th>
+              <th data-col="installazione">Inst.</th>
+              <th data-col="qta">Qtà</th>
+              <th data-col="granTot">Tot.</th>
+              <th data-col="venduto">Vend.€</th>
+              <th data-col="diff">Diff.</th>
+              <th data-col="azioni">Az.</th>
+            </tr>
+          </thead>
+          <tbody id="articoliBody"></tbody>
+        </table>
+      </div>
+      <p class="muted small" id="emptyMsg">Nessun articolo aggiunto. Cerca e aggiungi dal listino.</p>
+    </div>
+
+    <!-- Report -->
+    <div class="card">
+      <h3>📤 Esporta Preventivo</h3>
+      <div class="export-grid">
+        <button class="btn-export" id="btnWA">💬 WhatsApp</button>
+        <button class="btn-export" id="btnTXT">📄 Salva TXT</button>
+        <button class="btn-export btn-secondary" id="btnWANoMarg">💬 WA (no marg.)</button>
+        <button class="btn-export btn-secondary" id="btnTXTNoMarg">📄 TXT (no marg.)</button>
+        <button class="btn-export btn-accent" id="btnCopyClip">📋 Copia</button>
+        <button class="btn-export btn-danger-soft" id="btnClearAll">🗑️ Svuota lista</button>
+      </div>
+      <pre class="report-preview" id="reportPreview" style="display:none"></pre>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- Toast notification -->
+<div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+<!-- Libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+
+<!-- App -->
+<script src="js/app.js" defer></script>
+
+</body>
+</html>

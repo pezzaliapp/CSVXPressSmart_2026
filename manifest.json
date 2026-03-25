@@ -1,0 +1,37 @@
+{
+  "name": "CSVXpressSmart 2026",
+  "short_name": "CSVXpress",
+  "description": "Preventivi rapidi da CSV, disponibilità settimanale da XLSX, invio WhatsApp.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#f0f4f8",
+  "theme_color": "#1565c0",
+  "lang": "it-IT",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icon/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuovo preventivo",
+      "short_name": "Preventivo",
+      "description": "Apri CSVXpressSmart 2026",
+      "url": "./index.html",
+      "icons": [{ "src": "icon/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
