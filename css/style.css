@@ -678,7 +678,58 @@ tr:hover td { background: var(--brand-light); }
   .options-grid { grid-template-columns: 1fr; }
 }
 
-/* Scrollbar stilizzata */
+/* ===== TITOLO PREVENTIVO ===== */
+.titolo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.titolo-row label { font-size: .85rem; font-weight: 600; white-space: nowrap; }
+.titolo-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: .9rem;
+  background: var(--surface);
+  color: var(--text);
+}
+.titolo-input:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(21,101,192,.12);
+}
+
+/* ===== AZIONI COLONNA ===== */
+.azioni-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+
+.btn-move {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  font-size: .72rem;
+  color: var(--text2);
+  cursor: pointer;
+  line-height: 1;
+  transition: all var(--transition);
+}
+.btn-move:hover { background: var(--brand-light); color: var(--brand); }
+
+/* ===== TOTALI TABLE ===== */
+.totali-table { border-collapse: collapse; width: 100%; font-size: .86rem; }
+.totali-table td { padding: 4px 8px; }
+.totali-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.totali-table tr.highlight td { color: var(--success); font-size: 1rem; padding-top: 8px; border-top: 2px solid #a5d6a7; }
+
+/* ===== SCROLLBAR SOTTILE ===== */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
