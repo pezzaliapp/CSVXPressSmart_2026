@@ -1,5 +1,5 @@
-// CSVXpressSmart 2026 — Service Worker v2.0.0
-const CACHE = 'csvxpresssmart-2026-v2.0.0';
+// CSVXpressSmart 2026 — Service Worker v2.2.0
+const CACHE = 'csvxpresssmart-2026-v2.2.0';
 
 const APP_SHELL = [
   './',
